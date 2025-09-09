@@ -1,0 +1,82 @@
+[
+  {
+    "Id": 1,
+    "courseId": "1",
+    "assignmentId": "4",
+    "category": "Homework",
+    "points": 88,
+    "maxPoints": 100,
+    "weight": 25,
+    "date": "2024-12-15"
+  },
+  {
+    "Id": 2,
+    "courseId": "2",
+    "assignmentId": "2",
+    "category": "Quiz",
+    "points": 92,
+    "maxPoints": 100,
+    "weight": 20,
+    "date": "2024-12-10"
+  },
+  {
+    "Id": 3,
+    "courseId": "3",
+    "assignmentId": "8",
+    "category": "Assignment",
+    "points": 95,
+    "maxPoints": 100,
+    "weight": 15,
+    "date": "2024-12-12"
+  },
+  {
+    "Id": 4,
+    "courseId": "1",
+    "assignmentId": null,
+    "category": "Exam",
+    "points": 85,
+    "maxPoints": 100,
+    "weight": 30,
+    "date": "2024-12-05"
+  },
+  {
+    "Id": 5,
+    "courseId": "4",
+    "assignmentId": null,
+    "category": "Lab",
+    "points": 78,
+    "maxPoints": 80,
+    "weight": 20,
+    "date": "2024-12-08"
+  },
+  {
+    "Id": 6,
+    "courseId": "5",
+    "assignmentId": null,
+    "category": "Project",
+    "points": 94,
+    "maxPoints": 100,
+    "weight": 35,
+    "date": "2024-12-11"
+  },
+  {
+    "Id": 7,
+    "courseId": "2",
+    "assignmentId": null,
+    "category": "Homework",
+    "points": 87,
+    "maxPoints": 100,
+    "weight": 15,
+    "date": "2024-12-07"
+  },
+  {
+    "Id": 8,
+    "courseId": "3",
+    "assignmentId": null,
+    "category": "Participation",
+    "points": 100,
+    "maxPoints": 100,
+    "weight": 10,
+    "date": "2024-12-14"
+  }
+]
