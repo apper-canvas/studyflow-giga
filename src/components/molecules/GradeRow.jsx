@@ -12,7 +12,7 @@ const GradeRow = ({
   onDelete,
   className 
 }) => {
-  const percentage = grade.maxPoints > 0 ? (grade.points / grade.maxPoints) * 100 : 0;
+const percentage = grade.max_points_c > 0 ? (grade.points_c / grade.max_points_c) * 100 : 0;
   
   const getGradeColor = (percentage) => {
     if (percentage >= 90) return "text-success-600";
@@ -39,9 +39,9 @@ const GradeRow = ({
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2 mb-1">
             <h4 className="font-medium text-gray-900 truncate">
-              {assignment ? assignment.title : "Manual Grade Entry"}
+{assignment ? (assignment.title_c || assignment.title) : "Manual Grade Entry"}
             </h4>
-            <Badge variant="secondary">{grade.category}</Badge>
+<Badge variant="secondary">{grade.category_c}</Badge>
           </div>
           
           <div className="flex items-center space-x-4 text-sm text-gray-500">
@@ -49,7 +49,7 @@ const GradeRow = ({
               <div className="flex items-center space-x-1">
                 <div 
                   className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: course.color }}
+style={{ backgroundColor: course?.color_c || course?.color }}
                 />
                 <span>{course.name}</span>
               </div>
@@ -57,12 +57,12 @@ const GradeRow = ({
             
             <div className="flex items-center space-x-1">
               <ApperIcon name="Calendar" size={14} />
-              <span>{format(new Date(grade.date), "MMM dd, yyyy")}</span>
+<span>{format(new Date(grade.date_c), "MMM dd, yyyy")}</span>
             </div>
             
             <div className="flex items-center space-x-1">
               <ApperIcon name="Percent" size={14} />
-              <span>Weight: {grade.weight}%</span>
+<span>Weight: {grade.weight_c}%</span>
             </div>
           </div>
         </div>
@@ -70,7 +70,7 @@ const GradeRow = ({
         <div className="text-right">
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-600">
-              {grade.points} / {grade.maxPoints}
+{grade.points_c} / {grade.max_points_c}
             </span>
             <span className={cn("text-lg font-bold", getGradeColor(percentage))}>
               {percentage.toFixed(1)}%

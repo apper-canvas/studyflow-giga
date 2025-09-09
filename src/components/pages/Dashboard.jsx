@@ -17,17 +17,17 @@ import { toast } from "react-toastify";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [courses, setCourses] = useState([]);
+const [courses, setCourses] = useState([]);
   const [assignments, setAssignments] = useState([]);
   const [grades, setGrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
   const [stats, setStats] = useState({
     totalCourses: 0,
     totalAssignments: 0,
     completedAssignments: 0,
-averageGrade: 0,
+    pendingAssignments: 0,
+    averageGrade: 0,
     gpa: 0,
     goalProgress: []
   });
@@ -37,7 +37,7 @@ averageGrade: 0,
   }, []);
 
   const loadDashboardData = async () => {
-    try {
+try {
       setLoading(true);
       setError("");
 
@@ -52,10 +52,10 @@ averageGrade: 0,
       setGrades(gradesData);
 
       // Calculate stats
-      const completedCount = assignmentsData.filter(a => a.completed).length;
-const gradesWithScores = gradesData.filter(g => g.points !== null && g.maxPoints > 0);
+      const completedCount = assignmentsData.filter(a => a.completed_c).length;
+      const gradesWithScores = gradesData.filter(g => g.points_c !== null && g.max_points_c > 0);
       const averageGrade = gradesWithScores.length > 0 
-        ? gradesWithScores.reduce((sum, grade) => sum + (grade.points / grade.maxPoints) * 100, 0) / gradesWithScores.length
+        ? gradesWithScores.reduce((sum, grade) => sum + (grade.points_c / grade.max_points_c) * 100, 0) / gradesWithScores.length
         : 0;
 
       const gpa = await gradeService.calculateGPA();
@@ -78,7 +78,7 @@ const gradesWithScores = gradesData.filter(g => g.points !== null && g.maxPoints
     }
   };
 
-  const handleCompleteAssignment = async (assignmentId) => {
+const handleCompleteAssignment = async (assignmentId) => {
     try {
       await assignmentService.markComplete(assignmentId);
       toast.success("Assignment marked as complete!");
@@ -94,31 +94,31 @@ const gradesWithScores = gradesData.filter(g => g.points !== null && g.maxPoints
     const now = new Date();
     const nextWeek = addDays(now, 7);
     
-    return assignments
+return assignments
       .filter(assignment => 
-        !assignment.completed && 
-        isAfter(new Date(assignment.dueDate), now) &&
-        isBefore(new Date(assignment.dueDate), nextWeek)
+        !assignment.completed_c && 
+        isAfter(new Date(assignment.due_date_c), now) &&
+        isBefore(new Date(assignment.due_date_c), nextWeek)
       )
-      .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+      .sort((a, b) => new Date(a.due_date_c) - new Date(b.due_date_c))
       .slice(0, 5);
   };
 
   // Get overdue assignments
   const getOverdueAssignments = () => {
-    const now = new Date();
+const now = new Date();
     return assignments
       .filter(assignment => 
-        !assignment.completed && 
-        isBefore(new Date(assignment.dueDate), now)
+        !assignment.completed_c && 
+        isBefore(new Date(assignment.due_date_c), now)
       )
       .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
   };
 
   // Get recent grades
-  const getRecentGrades = () => {
+const getRecentGrades = () => {
     return grades
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .sort((a, b) => new Date(b.date_c) - new Date(a.date_c))
       .slice(0, 5);
   };
 
@@ -214,8 +214,8 @@ const gradesWithScores = gradesData.filter(g => g.points !== null && g.maxPoints
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Grade Distribution</h3>
           <div className="space-y-3">
             {recentGrades.slice(0, 3).map(grade => {
-              const course = courses.find(c => c.Id.toString() === grade.courseId);
-              const percentage = (grade.points / grade.maxPoints) * 100;
+const course = courses.find(c => c.Id === (grade.course_id_c?.Id || grade.course_id_c));
+              const percentage = (grade.points_c / grade.max_points_c) * 100;
               return (
                 <div key={grade.Id} className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
@@ -295,7 +295,7 @@ const gradesWithScores = gradesData.filter(g => g.points !== null && g.maxPoints
           </div>
           <div className="space-y-3">
             {overdueAssignments.slice(0, 3).map(assignment => {
-              const course = courses.find(c => c.Id.toString() === assignment.courseId);
+const course = courses.find(c => c.Id === (assignment.course_id_c?.Id || assignment.course_id_c));
               return (
                 <div key={assignment.Id} className="flex items-center justify-between p-3 bg-white rounded-lg border border-error-200">
                   <div>
@@ -335,7 +335,7 @@ const gradesWithScores = gradesData.filter(g => g.points !== null && g.maxPoints
         {upcomingAssignments.length > 0 ? (
           <div className="space-y-4">
             {upcomingAssignments.map(assignment => {
-              const course = courses.find(c => c.Id.toString() === assignment.courseId);
+const course = courses.find(c => c.Id === (assignment.course_id_c?.Id || assignment.course_id_c));
               return (
                 <AssignmentCard
                   key={assignment.Id}

@@ -7,12 +7,12 @@ import { cn } from "@/utils/cn";
 
 const AddCourseModal = ({ isOpen, onClose, onSave, editingCourse = null }) => {
   const [formData, setFormData] = useState({
-    name: editingCourse?.name || "",
-    instructor: editingCourse?.instructor || "",
-    schedule: editingCourse?.schedule || "",
-    credits: editingCourse?.credits || 3,
-    color: editingCourse?.color || "#7c3aed",
-    semester: editingCourse?.semester || "Fall 2024"
+name: editingCourse?.name_c || editingCourse?.name || "",
+    instructor: editingCourse?.instructor_c || editingCourse?.instructor || "",
+    schedule: editingCourse?.schedule_c || editingCourse?.schedule || "",
+    credits: editingCourse?.credits_c || editingCourse?.credits || 3,
+    color: editingCourse?.color_c || editingCourse?.color || "#7c3aed",
+    semester: editingCourse?.semester_c || editingCourse?.semester || "Fall 2024"
   });
 
   const [errors, setErrors] = useState({});

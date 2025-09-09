@@ -13,8 +13,8 @@ const AssignmentCard = ({
   onDelete,
   className 
 }) => {
-  const isOverdue = new Date(assignment.dueDate) < new Date() && !assignment.completed;
-  const isDueSoon = new Date(assignment.dueDate) < new Date(Date.now() + 24 * 60 * 60 * 1000) && !assignment.completed;
+const isOverdue = new Date(assignment.due_date_c) < new Date() && !assignment.completed_c;
+const isDueSoon = new Date(assignment.due_date_c) < new Date(Date.now() + 24 * 60 * 60 * 1000) && !assignment.completed_c;
 
   const priorityColors = {
     high: "error",
@@ -26,8 +26,8 @@ const AssignmentCard = ({
     <Card 
       variant="premium" 
       className={cn(
-        "p-4 transition-all duration-300",
-        assignment.completed && "opacity-75",
+"p-4 transition-all duration-300",
+        assignment.completed_c && "opacity-75",
         isOverdue && "ring-2 ring-error-200",
         className
       )}
@@ -36,15 +36,15 @@ const AssignmentCard = ({
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2 mb-2">
             <h3 className={cn(
-              "font-semibold text-gray-900 truncate",
-              assignment.completed && "line-through text-gray-500"
+"font-semibold text-gray-900 truncate",
+              assignment.completed_c && "line-through text-gray-500"
             )}>
               {assignment.title}
             </h3>
-            <Badge variant={priorityColors[assignment.priority]}>
-              {assignment.priority}
+<Badge variant={priorityColors[assignment.priority_c || 'medium']}>
+              {assignment.priority_c}
             </Badge>
-            {assignment.completed && (
+{assignment.completed_c && (
               <Badge variant="success">
                 <ApperIcon name="Check" size={12} className="mr-1" />
                 Complete
@@ -52,7 +52,7 @@ const AssignmentCard = ({
             )}
           </div>
           
-          {assignment.description && (
+{assignment.description_c && (
             <p className="text-sm text-gray-600 mb-3 line-clamp-2">
               {assignment.description}
             </p>
@@ -65,7 +65,7 @@ const AssignmentCard = ({
                 isOverdue && "text-error-600 font-medium",
                 isDueSoon && "text-warning-600 font-medium"
               )}>
-                Due {format(new Date(assignment.dueDate), "MMM dd, yyyy")}
+Due {format(new Date(assignment.due_date_c), "MMM dd, yyyy")}
               </span>
             </div>
             
@@ -73,13 +73,13 @@ const AssignmentCard = ({
               <div className="flex items-center space-x-1">
                 <div 
                   className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: course.color }}
+style={{ backgroundColor: course?.color_c || course?.color }}
                 />
                 <span>{course.name}</span>
               </div>
             )}
             
-            {assignment.grade !== null && assignment.grade !== undefined && (
+{assignment.grade_c !== null && assignment.grade_c !== undefined && (
               <div className="flex items-center space-x-1">
                 <ApperIcon name="Star" size={14} />
                 <span className="font-medium text-primary-600">
@@ -91,7 +91,7 @@ const AssignmentCard = ({
         </div>
         
         <div className="flex items-center space-x-2">
-          {!assignment.completed && (
+{!assignment.completed_c && (
             <Button
               size="sm"
               variant="success"

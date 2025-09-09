@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from 'react-redux';
 import Button from "@/components/atoms/Button";
 import ApperIcon from "@/components/ApperIcon";
 import { cn } from "@/utils/cn";
+import { AuthContext } from "../../App";
 
 const Header = ({ onAddClick, onTimerClick }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  const { logout } = useContext(AuthContext);
+  const { user } = useSelector((state) => state.user);
   const navigation = [
     { name: "Dashboard", path: "/", icon: "LayoutDashboard" },
     { name: "Courses", path: "/courses", icon: "BookOpen" },
@@ -99,6 +102,22 @@ const Header = ({ onAddClick, onTimerClick }) => {
                 <span>{getAddButtonText()}</span>
               </Button>
             )}
+            
+            {/* User Menu */}
+            <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-gray-200">
+              <div className="hidden sm:block text-sm">
+                <span className="text-gray-600">Welcome, </span>
+                <span className="font-medium text-gray-900">{user?.firstName || 'User'}</span>
+              </div>
+              <Button
+                variant="outline"
+                onClick={logout}
+                className="flex items-center space-x-2"
+              >
+                <ApperIcon name="LogOut" size={16} />
+                <span>Logout</span>
+              </Button>
+            </div>
 
             {/* Mobile menu button */}
             <button
@@ -140,7 +159,7 @@ const Header = ({ onAddClick, onTimerClick }) => {
               );
             })}
             
-            {onAddClick && (
+{onAddClick && (
               <div className="pt-2 border-t border-gray-200 mt-2">
                 <Button
                   variant="primary"
@@ -155,6 +174,26 @@ const Header = ({ onAddClick, onTimerClick }) => {
                 </Button>
               </div>
             )}
+            
+            {/* Mobile User Menu */}
+            <div className="pt-2 border-t border-gray-200 mt-2">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-gray-600">
+                  {user?.firstName || 'User'}
+                </span>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    logout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex items-center space-x-2"
+                >
+                  <ApperIcon name="LogOut" size={16} />
+                  <span>Logout</span>
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       )}

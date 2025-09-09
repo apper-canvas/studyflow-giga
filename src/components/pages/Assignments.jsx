@@ -60,7 +60,7 @@ const Assignments = () => {
     }
   };
 
-  const applyFilters = () => {
+const applyFilters = () => {
     let filtered = [...assignments];
     const now = new Date();
 
@@ -68,30 +68,32 @@ const Assignments = () => {
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
       filtered = filtered.filter(assignment =>
-        assignment.title.toLowerCase().includes(searchLower) ||
-        assignment.description.toLowerCase().includes(searchLower)
+        assignment.title_c?.toLowerCase().includes(searchLower) ||
+        assignment.description_c?.toLowerCase().includes(searchLower)
       );
     }
 
     // Course filter
     if (filters.course) {
-      filtered = filtered.filter(assignment => assignment.courseId === filters.course);
+      filtered = filtered.filter(assignment => 
+        (assignment.course_id_c?.Id == filters.course) || (assignment.course_id_c == filters.course)
+      );
     }
 
     // Status filter
     if (filters.status !== "all") {
       switch (filters.status) {
         case "completed":
-          filtered = filtered.filter(assignment => assignment.completed);
+          filtered = filtered.filter(assignment => assignment.completed_c);
           break;
         case "pending":
           filtered = filtered.filter(assignment => 
-            !assignment.completed && isAfter(new Date(assignment.dueDate), now)
+            !assignment.completed_c && isAfter(new Date(assignment.due_date_c), now)
           );
           break;
         case "overdue":
           filtered = filtered.filter(assignment =>
-            !assignment.completed && isBefore(new Date(assignment.dueDate), now)
+            !assignment.completed_c && isBefore(new Date(assignment.due_date_c), now)
           );
           break;
       }
@@ -99,20 +101,20 @@ const Assignments = () => {
 
     // Priority filter
     if (filters.priority !== "all") {
-      filtered = filtered.filter(assignment => assignment.priority === filters.priority);
+      filtered = filtered.filter(assignment => assignment.priority_c === filters.priority);
     }
 
     // Sort
     filtered.sort((a, b) => {
       switch (filters.sortBy) {
         case "title":
-          return a.title.localeCompare(b.title);
+          return (a.title_c || '').localeCompare(b.title_c || '');
         case "priority":
           const priorityOrder = { high: 3, medium: 2, low: 1 };
-          return priorityOrder[b.priority] - priorityOrder[a.priority];
+          return priorityOrder[b.priority_c || 'medium'] - priorityOrder[a.priority_c || 'medium'];
         case "dueDate":
         default:
-          return new Date(a.dueDate) - new Date(b.dueDate);
+          return new Date(a.due_date_c || 0) - new Date(b.due_date_c || 0);
       }
     });
 
@@ -189,13 +191,13 @@ const Assignments = () => {
     }
   };
 
-  const getStatusCounts = () => {
+const getStatusCounts = () => {
     const now = new Date();
     return {
       all: assignments.length,
-      pending: assignments.filter(a => !a.completed && isAfter(new Date(a.dueDate), now)).length,
-      completed: assignments.filter(a => a.completed).length,
-      overdue: assignments.filter(a => !a.completed && isBefore(new Date(a.dueDate), now)).length
+      pending: assignments.filter(a => !a.completed_c && isAfter(new Date(a.due_date_c), now)).length,
+      completed: assignments.filter(a => a.completed_c).length,
+      overdue: assignments.filter(a => !a.completed_c && isBefore(new Date(a.due_date_c), now)).length
     };
   };
 
@@ -355,8 +357,8 @@ const Assignments = () => {
       {/* Assignments List */}
       {filteredAssignments.length > 0 ? (
         <div className="space-y-4">
-          {filteredAssignments.map((assignment) => {
-            const course = courses.find(c => c.Id.toString() === assignment.courseId);
+{filteredAssignments.map((assignment) => {
+            const course = courses.find(c => c.Id === (assignment.course_id_c?.Id || assignment.course_id_c));
             return (
               <AssignmentCard
                 key={assignment.Id}

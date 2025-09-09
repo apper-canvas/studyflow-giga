@@ -7,16 +7,16 @@ import { courseService } from "@/services/api/courseService";
 import { assignmentService } from "@/services/api/assignmentService";
 
 const AddGradeModal = ({ isOpen, onClose, onSave, editingGrade = null }) => {
-  const [courses, setCourses] = useState([]);
+const [courses, setCourses] = useState([]);
   const [assignments, setAssignments] = useState([]);
   const [formData, setFormData] = useState({
-    courseId: editingGrade?.courseId || "",
-    assignmentId: editingGrade?.assignmentId || "",
-    category: editingGrade?.category || "Assignment",
-    points: editingGrade?.points || "",
-    maxPoints: editingGrade?.maxPoints || "",
-    weight: editingGrade?.weight || 10,
-    date: editingGrade?.date || new Date().toISOString().slice(0, 10)
+    courseId: editingGrade?.course_id_c?.Id || editingGrade?.courseId || "",
+    assignmentId: editingGrade?.assignment_id_c?.Id || editingGrade?.assignmentId || "",
+    category: editingGrade?.category_c || editingGrade?.category || "Assignment",
+    points: editingGrade?.points_c || editingGrade?.points || "",
+    maxPoints: editingGrade?.max_points_c || editingGrade?.maxPoints || "",
+    weight: editingGrade?.weight_c || editingGrade?.weight || 10,
+    date: editingGrade?.date_c || editingGrade?.date || new Date().toISOString().slice(0, 10)
   });
 
   const [errors, setErrors] = useState({});
@@ -52,10 +52,12 @@ const AddGradeModal = ({ isOpen, onClose, onSave, editingGrade = null }) => {
     }
   };
 
-  const loadAssignmentsByCourse = async () => {
+const loadAssignmentsByCourse = async () => {
     try {
       const data = await assignmentService.getAll();
-      const filteredAssignments = data.filter(assignment => assignment.courseId === formData.courseId);
+      const filteredAssignments = data.filter(assignment => 
+        (assignment.course_id_c?.Id == formData.courseId) || (assignment.course_id_c == formData.courseId)
+      );
       setAssignments(filteredAssignments);
     } catch (error) {
       console.error("Error loading assignments by course:", error);
@@ -200,9 +202,9 @@ const AddGradeModal = ({ isOpen, onClose, onSave, editingGrade = null }) => {
                   required
                 >
                   <option value="">Select a course</option>
-                  {courses.map((course) => (
+{courses.map((course) => (
                     <option key={course.Id} value={course.Id}>
-                      {course.name}
+                      {course.name_c || course.name}
                     </option>
                   ))}
                 </FormField>
@@ -215,9 +217,9 @@ const AddGradeModal = ({ isOpen, onClose, onSave, editingGrade = null }) => {
                   onChange={handleInputChange}
                 >
                   <option value="">Select an assignment (optional)</option>
-                  {assignments.map((assignment) => (
+{assignments.map((assignment) => (
                     <option key={assignment.Id} value={assignment.Id}>
-                      {assignment.title}
+                      {assignment.title_c || assignment.title}
                     </option>
                   ))}
                 </FormField>

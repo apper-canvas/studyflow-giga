@@ -22,31 +22,30 @@ const CourseCard = ({
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-3 mb-3">
             <div 
-              className="w-4 h-4 rounded-full"
-              style={{ backgroundColor: course.color }}
+className="w-4 h-4 rounded-full"
+              style={{ backgroundColor: course.color_c || course.color }}
             />
             <h3 className="font-semibold text-lg text-gray-900 truncate">
-              {course.name}
+              {course.name_c || course.name}
             </h3>
             <Badge variant="secondary">
               {course.credits} {course.credits === 1 ? "credit" : "credits"}
             </Badge>
           </div>
-          
-          <div className="space-y-2 mb-4">
+<div className="space-y-2 mb-4">
             <div className="flex items-center space-x-2 text-sm text-gray-600">
               <ApperIcon name="User" size={16} />
-              <span>{course.instructor}</span>
+              <span>{course.instructor_c || course.instructor}</span>
             </div>
             
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
+<div className="flex items-center space-x-2 text-sm text-gray-600">
               <ApperIcon name="Clock" size={16} />
-              <span>{course.schedule}</span>
+              <span>{course.schedule_c || course.schedule}</span>
             </div>
             
             <div className="flex items-center space-x-2 text-sm text-gray-600">
               <ApperIcon name="Calendar" size={16} />
-              <span>{course.semester}</span>
+<span>{course.semester_c || course.semester}</span>
             </div>
           </div>
           

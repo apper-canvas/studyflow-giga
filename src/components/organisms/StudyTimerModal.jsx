@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
-import Button from "@/components/atoms/Button";
-import Card from "@/components/atoms/Card";
-import Select from "@/components/atoms/Select";
-import ApperIcon from "@/components/ApperIcon";
+import React, { useCallback, useEffect, useState } from "react";
 import { courseService } from "@/services/api/courseService";
 import { studyTimerService } from "@/services/api/studyTimerService";
 import { toast } from "react-toastify";
+import ApperIcon from "@/components/ApperIcon";
+import Select from "@/components/atoms/Select";
+import Card from "@/components/atoms/Card";
+import Button from "@/components/atoms/Button";
 
 const StudyTimerModal = ({ isOpen, onClose }) => {
   const [courses, setCourses] = useState([]);
@@ -17,7 +17,7 @@ const StudyTimerModal = ({ isOpen, onClose }) => {
   const [sessionId, setSessionId] = useState(null);
 
   // Load courses on mount
-  useEffect(() => {
+useEffect(() => {
     const loadCourses = async () => {
       try {
         const courseData = await courseService.getAll();
@@ -92,8 +92,8 @@ const StudyTimerModal = ({ isOpen, onClose }) => {
         status: 'completed'
       });
 
-      const selectedCourse = courses.find(c => c.Id === parseInt(selectedCourseId));
-      toast.success(`Study session completed! You studied ${selectedCourse?.name} for ${formatTime(duration)}.`);
+const selectedCourse = courses.find(c => c.Id === parseInt(selectedCourseId));
+      toast.success(`Study session completed! You studied ${selectedCourse?.name_c || selectedCourse?.name} for ${formatTime(duration)}.`);
     }
 
     // Reset timer state
@@ -153,9 +153,9 @@ const StudyTimerModal = ({ isOpen, onClose }) => {
               disabled={isRunning}
             >
               <option value="">Choose a subject...</option>
-              {courses.map((course) => (
+{courses.map((course) => (
                 <option key={course.Id} value={course.Id}>
-                  {course.name}
+                  {course.name_c || course.name}
                 </option>
               ))}
             </Select>

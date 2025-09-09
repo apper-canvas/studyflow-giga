@@ -6,15 +6,15 @@ import ApperIcon from "@/components/ApperIcon";
 import { courseService } from "@/services/api/courseService";
 
 const AddAssignmentModal = ({ isOpen, onClose, onSave, editingAssignment = null }) => {
-  const [courses, setCourses] = useState([]);
+const [courses, setCourses] = useState([]);
   const [formData, setFormData] = useState({
-    courseId: editingAssignment?.courseId || "",
-    title: editingAssignment?.title || "",
-    description: editingAssignment?.description || "",
-    dueDate: editingAssignment?.dueDate || "",
-    priority: editingAssignment?.priority || "medium",
-    completed: editingAssignment?.completed || false,
-    grade: editingAssignment?.grade || ""
+    courseId: editingAssignment?.course_id_c?.Id || editingAssignment?.courseId || "",
+    title: editingAssignment?.title_c || editingAssignment?.title || "",
+    description: editingAssignment?.description_c || editingAssignment?.description || "",
+    dueDate: editingAssignment?.due_date_c || editingAssignment?.dueDate || "",
+    priority: editingAssignment?.priority_c || editingAssignment?.priority || "medium",
+    completed: editingAssignment?.completed_c || editingAssignment?.completed || false,
+    grade: editingAssignment?.grade_c || editingAssignment?.grade || ""
   });
 
   const [errors, setErrors] = useState({});
@@ -116,16 +116,16 @@ const AddAssignmentModal = ({ isOpen, onClose, onSave, editingAssignment = null 
   };
 
   // Set initial due date if editing
-  useEffect(() => {
+useEffect(() => {
     if (editingAssignment && isOpen) {
       setFormData({
-        courseId: editingAssignment.courseId || "",
-        title: editingAssignment.title || "",
-        description: editingAssignment.description || "",
-        dueDate: formatDateForInput(editingAssignment.dueDate),
-        priority: editingAssignment.priority || "medium",
-        completed: editingAssignment.completed || false,
-        grade: editingAssignment.grade ? editingAssignment.grade.toString() : ""
+        courseId: editingAssignment.course_id_c?.Id || editingAssignment.courseId || "",
+        title: editingAssignment.title_c || editingAssignment.title || "",
+        description: editingAssignment.description_c || editingAssignment.description || "",
+        dueDate: formatDateForInput(editingAssignment.due_date_c || editingAssignment.dueDate),
+        priority: editingAssignment.priority_c || editingAssignment.priority || "medium",
+        completed: editingAssignment.completed_c || editingAssignment.completed || false,
+        grade: (editingAssignment.grade_c || editingAssignment.grade) ? (editingAssignment.grade_c || editingAssignment.grade).toString() : ""
       });
     }
   }, [editingAssignment, isOpen]);
@@ -174,9 +174,9 @@ const AddAssignmentModal = ({ isOpen, onClose, onSave, editingAssignment = null 
                   required
                 >
                   <option value="">Select a course</option>
-                  {courses.map((course) => (
+{courses.map((course) => (
                     <option key={course.Id} value={course.Id}>
-                      {course.name}
+                      {course.name_c || course.name}
                     </option>
                   ))}
                 </FormField>

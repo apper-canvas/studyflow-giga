@@ -23,7 +23,7 @@ const Courses = () => {
   }, []);
 
   const loadData = async () => {
-    try {
+try {
       setLoading(true);
       setError("");
 
@@ -44,14 +44,18 @@ const Courses = () => {
     }
   };
 
-  const getCourseStats = (courseId) => {
-    const courseAssignments = assignments.filter(a => a.courseId === courseId.toString());
-    const courseGrades = grades.filter(g => g.courseId === courseId.toString());
+const getCourseStats = (courseId) => {
+    const courseAssignments = assignments.filter(a => 
+      (a.course_id_c?.Id === courseId) || (a.course_id_c === courseId)
+    );
+    const courseGrades = grades.filter(g => 
+      (g.course_id_c?.Id === courseId) || (g.course_id_c === courseId)
+    );
     
-    const completed = courseAssignments.filter(a => a.completed).length;
-    const gradesWithScores = courseGrades.filter(g => g.points !== null && g.maxPoints > 0);
+    const completed = courseAssignments.filter(a => a.completed_c).length;
+    const gradesWithScores = courseGrades.filter(g => g.points_c !== null && g.max_points_c > 0);
     const averageGrade = gradesWithScores.length > 0 
-      ? gradesWithScores.reduce((sum, grade) => sum + (grade.points / grade.maxPoints) * 100, 0) / gradesWithScores.length
+      ? gradesWithScores.reduce((sum, grade) => sum + (grade.points_c / grade.max_points_c) * 100, 0) / gradesWithScores.length
       : null;
 
     return {

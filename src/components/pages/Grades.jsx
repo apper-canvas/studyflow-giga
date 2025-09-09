@@ -77,35 +77,37 @@ useEffect(() => {
     }
   };
 
-  const applyFilters = () => {
+const applyFilters = () => {
     let filtered = [...grades];
 
     // Course filter
     if (filters.course) {
-      filtered = filtered.filter(grade => grade.courseId === filters.course);
+      filtered = filtered.filter(grade => 
+        (grade.course_id_c?.Id == filters.course) || (grade.course_id_c == filters.course)
+      );
     }
 
     // Category filter
     if (filters.category !== "all") {
-      filtered = filtered.filter(grade => grade.category === filters.category);
+      filtered = filtered.filter(grade => grade.category_c === filters.category);
     }
 
     // Sort
     filtered.sort((a, b) => {
       switch (filters.sortBy) {
         case "course":
-          const courseA = courses.find(c => c.Id.toString() === a.courseId)?.name || "";
-          const courseB = courses.find(c => c.Id.toString() === b.courseId)?.name || "";
+          const courseA = courses.find(c => c.Id === (a.course_id_c?.Id || a.course_id_c))?.name_c || "";
+          const courseB = courses.find(c => c.Id === (b.course_id_c?.Id || b.course_id_c))?.name_c || "";
           return courseA.localeCompare(courseB);
         case "grade":
-          const percentageA = (a.points / a.maxPoints) * 100;
-          const percentageB = (b.points / b.maxPoints) * 100;
+          const percentageA = (a.points_c / a.max_points_c) * 100;
+          const percentageB = (b.points_c / b.max_points_c) * 100;
           return percentageB - percentageA;
         case "category":
-          return a.category.localeCompare(b.category);
+          return (a.category_c || '').localeCompare(b.category_c || '');
         case "date":
         default:
-          return new Date(b.date) - new Date(a.date);
+          return new Date(b.date_c || 0) - new Date(a.date_c || 0);
       }
     });
 
@@ -117,15 +119,15 @@ const calculateStats = async () => {
 
     try {
       const gpa = await gradeService.calculateGPA();
-      const gradesWithScores = grades.filter(g => g.points !== null && g.maxPoints > 0);
+      const gradesWithScores = grades.filter(g => g.points_c !== null && g.max_points_c > 0);
       
       if (gradesWithScores.length > 0) {
         const totalPercentage = gradesWithScores.reduce((sum, grade) => {
-          return sum + (grade.points / grade.maxPoints) * 100;
+          return sum + (grade.points_c / grade.max_points_c) * 100;
         }, 0);
         
         const averageGrade = totalPercentage / gradesWithScores.length;
-        const highestGrade = Math.max(...gradesWithScores.map(g => (g.points / g.maxPoints) * 100));
+        const highestGrade = Math.max(...gradesWithScores.map(g => (g.points_c / g.max_points_c) * 100));
 
         setStats({
           overallGPA: gpa,
@@ -213,8 +215,8 @@ const calculateStats = async () => {
     }
   };
 
-  const getUniqueCategories = () => {
-    const categories = [...new Set(grades.map(grade => grade.category))];
+const getUniqueCategories = () => {
+    const categories = [...new Set(grades.map(grade => grade.category_c).filter(Boolean))];
     return categories.sort();
   };
 
@@ -417,8 +419,8 @@ const calculateStats = async () => {
       {filteredGrades.length > 0 ? (
         <div className="space-y-4">
           {filteredGrades.map((grade) => {
-            const course = courses.find(c => c.Id.toString() === grade.courseId);
-            const assignment = assignments.find(a => a.Id.toString() === grade.assignmentId);
+const course = courses.find(c => c.Id === (grade.course_id_c?.Id || grade.course_id_c));
+            const assignment = assignments.find(a => a.Id === (grade.assignment_id_c?.Id || grade.assignment_id_c));
             
             return (
               <GradeRow

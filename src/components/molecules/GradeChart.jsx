@@ -89,10 +89,10 @@ const GradeChart = ({ grades, title = "Grade Distribution", showGoals = false, c
   });
 
 useEffect(() => {
-    if (grades && grades.length > 0) {
+if (grades && grades.length > 0) {
       // Calculate grade distribution
       const distribution = grades.reduce((acc, grade) => {
-        const percentage = (grade.points / grade.maxPoints) * 100;
+        const percentage = (grade.points_c / grade.max_points_c) * 100;
         let letterGrade;
         
         if (percentage >= 90) letterGrade = "A";
@@ -116,15 +116,17 @@ useEffect(() => {
     // Calculate goal progress if showing goals
     if (showGoals && courses.length > 0 && grades.length > 0) {
       const courseProgress = courses.map(course => {
-        const courseGrades = grades.filter(g => g.courseId === course.Id.toString());
+const courseGrades = grades.filter(g => 
+          (g.course_id_c?.Id === course.Id) || (g.course_id_c === course.Id)
+        );
         if (courseGrades.length === 0) return null;
 
         const totalWeightedPoints = courseGrades.reduce((sum, grade) => {
-          const percentage = (grade.points / grade.maxPoints) * 100;
-          return sum + (percentage * grade.weight) / 100;
+const percentage = (grade.points_c / grade.max_points_c) * 100;
+          return sum + (percentage * grade.weight_c) / 100;
         }, 0);
         
-        const totalWeight = courseGrades.reduce((sum, grade) => sum + grade.weight, 0);
+const totalWeight = courseGrades.reduce((sum, grade) => sum + grade.weight_c, 0);
         const currentAverage = totalWeight > 0 ? (totalWeightedPoints / totalWeight) * 100 : 0;
         const goalTarget = course.gradeGoal || 85;
 

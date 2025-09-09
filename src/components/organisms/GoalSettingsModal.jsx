@@ -92,17 +92,17 @@ const GoalSettingsModal = ({ isOpen, onClose, onSave }) => {
 
           {/* Goals List */}
           <div className="space-y-4">
-            {courses.map(course => (
+{courses.map(course => (
               <div key={course.Id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <div 
                       className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: course.color }}
+                      style={{ backgroundColor: course.color_c || course.color }}
                     />
                     <div>
-                      <h3 className="font-medium text-gray-900">{course.name}</h3>
-                      <p className="text-sm text-gray-600">{course.instructor}</p>
+                      <h3 className="font-medium text-gray-900">{course.name_c || course.name}</h3>
+                      <p className="text-sm text-gray-600">{course.instructor_c || course.instructor}</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
