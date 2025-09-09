@@ -10,9 +10,11 @@ import CalendarPage from "@/components/pages/CalendarPage";
 import AddCourseModal from "@/components/organisms/AddCourseModal";
 import AddAssignmentModal from "@/components/organisms/AddAssignmentModal";
 import AddGradeModal from "@/components/organisms/AddGradeModal";
+import StudyTimerModal from "@/components/organisms/StudyTimerModal";
 
 function App() {
-  const [activeModal, setActiveModal] = useState(null);
+const [activeModal, setActiveModal] = useState(null);
+  const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
 
   const handleAddClick = () => {
     const path = window.location.pathname;
@@ -34,7 +36,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-gray-50">
-        <Header onAddClick={handleAddClick} />
+<Header onAddClick={handleAddClick} onTimerClick={() => setIsTimerModalOpen(true)} />
         
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Routes>
@@ -64,7 +66,11 @@ function App() {
           onClose={() => setActiveModal(null)}
           onSave={handleModalSave}
         />
-
+{/* Study Timer Modal */}
+        <StudyTimerModal 
+          isOpen={isTimerModalOpen} 
+          onClose={() => setIsTimerModalOpen(false)} 
+        />
         {/* Toast Notifications */}
         <ToastContainer
           position="top-right"

@@ -4,7 +4,7 @@ import Button from "@/components/atoms/Button";
 import ApperIcon from "@/components/ApperIcon";
 import { cn } from "@/utils/cn";
 
-const Header = ({ onAddClick }) => {
+const Header = ({ onAddClick, onTimerClick }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -77,8 +77,18 @@ const Header = ({ onAddClick }) => {
             })}
           </nav>
 
-          {/* Actions */}
+{/* Actions */}
           <div className="flex items-center space-x-3">
+            {onTimerClick && (
+              <Button
+                variant="outline"
+                onClick={onTimerClick}
+                className="hidden sm:flex items-center space-x-2"
+              >
+                <ApperIcon name="Clock" size={16} />
+                <span>Study Timer</span>
+              </Button>
+            )}
             {onAddClick && (
               <Button
                 variant="primary"
