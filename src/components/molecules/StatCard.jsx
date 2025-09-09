@@ -9,7 +9,8 @@ const StatCard = ({
   trend, 
   trendValue, 
   color = "primary",
-  className 
+  className,
+  goalProgress
 }) => {
   const colorVariants = {
     primary: "from-primary-500 to-primary-600",
@@ -27,7 +28,7 @@ const StatCard = ({
   };
 
   return (
-    <Card variant="premium" className={cn("p-6", className)}>
+<Card variant="premium" className={cn("p-6", className)}>
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <p className="text-sm font-medium text-gray-600">{title}</p>
@@ -44,6 +45,32 @@ const StatCard = ({
               <span className={cn("text-sm font-medium", trendColors[trend])}>
                 {trendValue}
               </span>
+            </div>
+          )}
+          {goalProgress && (
+            <div className="space-y-1">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-gray-500">Goal Progress</span>
+                <span className={cn(
+                  "font-medium",
+                  goalProgress.progress >= 100 ? "text-success-600" :
+                  goalProgress.progress >= 90 ? "text-primary-600" :
+                  goalProgress.progress >= 80 ? "text-warning-600" : "text-error-600"
+                )}>
+                  {goalProgress.progress.toFixed(0)}%
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className={cn(
+                    "h-2 rounded-full transition-all duration-300",
+                    goalProgress.progress >= 100 ? "bg-gradient-to-r from-success-500 to-success-600" :
+                    goalProgress.progress >= 90 ? "bg-gradient-to-r from-primary-500 to-primary-600" :
+                    goalProgress.progress >= 80 ? "bg-gradient-to-r from-warning-500 to-warning-600" : "bg-gradient-to-r from-error-500 to-error-600"
+                  )}
+                  style={{ width: `${Math.min(goalProgress.progress, 100)}%` }}
+                />
+              </div>
             </div>
           )}
         </div>

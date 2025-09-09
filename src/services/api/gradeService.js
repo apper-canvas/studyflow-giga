@@ -64,7 +64,7 @@ class GradeService {
   }
 
   // Calculate GPA for all courses or specific course
-  async calculateGPA(courseId = null) {
+async calculateGPA(courseId = null) {
     await new Promise(resolve => setTimeout(resolve, 200));
     
     let relevantGrades = [...this.grades];
@@ -102,6 +102,54 @@ class GradeService {
     if (averagePercentage >= 67) return 1.0;
     if (averagePercentage >= 60) return 0.7;
     return 0.0;
+  }
+
+  async calculateGoalProgress(courses) {
+    await new Promise(resolve => setTimeout(resolve, 200));
+    
+    return courses.map(course => {
+      const courseGrades = this.grades.filter(grade => grade.courseId === course.Id.toString());
+      
+      if (courseGrades.length === 0) {
+        return {
+          courseId: course.Id,
+          courseName: course.name,
+          currentGrade: 0,
+          goalGrade: course.gradeGoal || 85,
+          progress: 0,
+          status: 'no-data'
+        };
+      }
+
+      // Calculate current weighted average for course
+      let totalWeightedPoints = 0;
+      let totalWeight = 0;
+
+      courseGrades.forEach(grade => {
+        const percentage = (grade.points / grade.maxPoints) * 100;
+        const weightedPoints = (percentage * grade.weight) / 100;
+        totalWeightedPoints += weightedPoints;
+        totalWeight += grade.weight;
+      });
+
+      const currentGrade = totalWeight > 0 ? (totalWeightedPoints / totalWeight) * 100 : 0;
+      const goalGrade = course.gradeGoal || 85;
+      const progress = goalGrade > 0 ? (currentGrade / goalGrade) * 100 : 0;
+
+      let status = 'on-track';
+      if (progress < 80) status = 'behind';
+      else if (progress < 90) status = 'warning';
+      else if (progress >= 100) status = 'achieved';
+
+      return {
+        courseId: course.Id,
+        courseName: course.name,
+        currentGrade: currentGrade,
+        goalGrade: goalGrade,
+        progress: progress,
+        status: status
+      };
+    });
   }
 }
 

@@ -6,7 +6,8 @@
     "schedule": "MWF 10:00-11:00 AM",
     "credits": 3,
     "color": "#7c3aed",
-    "semester": "Fall 2024"
+    "semester": "Fall 2024",
+    "gradeGoal": 85
   },
   {
     "Id": 2,

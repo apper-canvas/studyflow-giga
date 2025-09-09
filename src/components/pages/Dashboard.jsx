@@ -27,8 +27,9 @@ const Dashboard = () => {
     totalCourses: 0,
     totalAssignments: 0,
     completedAssignments: 0,
-    averageGrade: 0,
-    gpa: 0
+averageGrade: 0,
+    gpa: 0,
+    goalProgress: []
   });
 
   useEffect(() => {
@@ -52,19 +53,21 @@ const Dashboard = () => {
 
       // Calculate stats
       const completedCount = assignmentsData.filter(a => a.completed).length;
-      const gradesWithScores = gradesData.filter(g => g.points !== null && g.maxPoints > 0);
+const gradesWithScores = gradesData.filter(g => g.points !== null && g.maxPoints > 0);
       const averageGrade = gradesWithScores.length > 0 
         ? gradesWithScores.reduce((sum, grade) => sum + (grade.points / grade.maxPoints) * 100, 0) / gradesWithScores.length
         : 0;
 
       const gpa = await gradeService.calculateGPA();
+      const goalProgress = await gradeService.calculateGoalProgress(coursesData);
 
       setStats({
         totalCourses: coursesData.length,
         totalAssignments: assignmentsData.length,
         completedAssignments: completedCount,
         averageGrade: averageGrade,
-        gpa: gpa
+        gpa: gpa,
+        goalProgress: goalProgress
       });
 
     } catch (err) {
@@ -176,11 +179,14 @@ const Dashboard = () => {
           icon="Award"
           color="success"
         />
-        <StatCard
+<StatCard
           title="Current GPA"
           value={stats.gpa.toFixed(2)}
           icon="TrendingUp"
           color="warning"
+          goalProgress={stats.goalProgress.length > 0 ? {
+            progress: (stats.averageGrade / (stats.goalProgress.reduce((sum, g) => sum + g.goalGrade, 0) / stats.goalProgress.length)) * 100
+          } : null}
         />
       </div>
 

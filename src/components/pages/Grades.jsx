@@ -1,35 +1,42 @@
-import { useState, useEffect } from "react";
-import Button from "@/components/atoms/Button";
-import Select from "@/components/atoms/Select";
-import GradeRow from "@/components/molecules/GradeRow";
-import GradeChart from "@/components/molecules/GradeChart";
-import StatCard from "@/components/molecules/StatCard";
-import AddGradeModal from "@/components/organisms/AddGradeModal";
-import Loading from "@/components/ui/Loading";
-import Error from "@/components/ui/Error";
-import Empty from "@/components/ui/Empty";
-import ApperIcon from "@/components/ApperIcon";
+import React, { useEffect, useState } from "react";
+import GoalSettingsModal from "@/components/organisms/GoalSettingsModal";
 import { gradeService } from "@/services/api/gradeService";
 import { courseService } from "@/services/api/courseService";
 import { assignmentService } from "@/services/api/assignmentService";
 import { toast } from "react-toastify";
+import { cn } from "@/lib/utils";
+import ApperIcon from "@/components/ApperIcon";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Loading from "@/components/ui/Loading";
+import StatCard from "@/components/molecules/StatCard";
+import GradeRow from "@/components/molecules/GradeRow";
+import GradeChart from "@/components/molecules/GradeChart";
+import Select from "@/components/atoms/Select";
+import Button from "@/components/atoms/Button";
+import AddGradeModal from "@/components/organisms/AddGradeModal";
+import Courses from "@/components/pages/Courses";
 
 const Grades = () => {
   const [grades, setGrades] = useState([]);
-  const [courses, setCourses] = useState([]);
+const [courses, setCourses] = useState([]);
   const [assignments, setAssignments] = useState([]);
+  const [goalProgress, setGoalProgress] = useState([]);
   const [filteredGrades, setFilteredGrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editingGrade, setEditingGrade] = useState(null);
   
-  // Filter states
+// Filter states
   const [filters, setFilters] = useState({
     course: "",
     category: "all",
     sortBy: "date" // date, course, grade, category
   });
+
+  // Goal modal state
+  const [goalModalOpen, setGoalModalOpen] = useState(false);
 
   const [stats, setStats] = useState({
     overallGPA: 0,
@@ -38,14 +45,15 @@ const Grades = () => {
     highestGrade: 0
   });
 
-  useEffect(() => {
+useEffect(() => {
     loadData();
   }, []);
 
   useEffect(() => {
     applyFilters();
     calculateStats();
-  }, [grades, filters]);
+    calculateGoalProgress();
+  }, [grades, filters, courses]);
 
   const loadData = async () => {
     try {
@@ -104,7 +112,7 @@ const Grades = () => {
     setFilteredGrades(filtered);
   };
 
-  const calculateStats = async () => {
+const calculateStats = async () => {
     if (grades.length === 0) return;
 
     try {
@@ -129,6 +137,23 @@ const Grades = () => {
     } catch (error) {
       console.error("Error calculating stats:", error);
     }
+  };
+
+  const calculateGoalProgress = async () => {
+    if (courses.length === 0) return;
+
+    try {
+      const progress = await gradeService.calculateGoalProgress(courses);
+      setGoalProgress(progress);
+    } catch (error) {
+      console.error("Error calculating goal progress:", error);
+    }
+  };
+
+  const handleGoalSettingsUpdate = () => {
+    setGoalModalOpen(false);
+    loadData(); // Refresh data to get updated goals
+    toast.success("Goals updated successfully!");
   };
 
   const handleFilterChange = (key, value) => {
@@ -217,7 +242,7 @@ const Grades = () => {
   }
 
   return (
-    <div className="space-y-6">
+<div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -226,15 +251,32 @@ const Grades = () => {
             Track your academic performance and GPA
           </p>
         </div>
+        <div className="flex items-center space-x-3">
+          <Button
+            variant="outline"
+            onClick={() => setGoalModalOpen(true)}
+            className="flex items-center space-x-2"
+          >
+            <ApperIcon name="Target" size={16} />
+            <span>Goal Settings</span>
+          </Button>
+          <Button onClick={handleAddGrade} className="flex items-center space-x-2">
+            <ApperIcon name="Plus" size={16} />
+            <span>Add Grade</span>
+          </Button>
+        </div>
       </div>
 
-      {/* Stats Overview */}
+{/* Stats Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Overall GPA"
           value={stats.overallGPA.toFixed(2)}
           icon="TrendingUp"
           color="primary"
+          goalProgress={goalProgress.length > 0 ? {
+            progress: (stats.averageGrade / (goalProgress.reduce((sum, g) => sum + g.goalGrade, 0) / goalProgress.length)) * 100
+          } : null}
         />
         <StatCard
           title="Average Grade"
@@ -249,50 +291,68 @@ const Grades = () => {
           color="info"
         />
         <StatCard
-          title="Highest Grade"
-          value={`${stats.highestGrade.toFixed(1)}%`}
-          icon="Star"
+          title="Goals On Track"
+          value={goalProgress.filter(g => g.status === 'on-track' || g.status === 'achieved').length}
+          icon="Target"
           color="warning"
         />
       </div>
 
-      {/* Grade Chart */}
+{/* Grade Chart with Goals */}
       {grades.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <GradeChart grades={grades} title="Grade Distribution" />
-          
-          {/* GPA by Course */}
-          <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">GPA by Course</h3>
-            <div className="space-y-3">
-              {courses.slice(0, 5).map(course => {
-                const courseGrades = grades.filter(g => g.courseId === course.Id.toString());
-                if (courseGrades.length === 0) return null;
+<GradeChart 
+          grades={grades} 
+          title="Grade Distribution" 
+          showGoals={true}
+          courses={courses}
+        />
+      )}
 
-                const totalWeightedPoints = courseGrades.reduce((sum, grade) => {
-                  const percentage = (grade.points / grade.maxPoints) * 100;
-                  return sum + (percentage * grade.weight) / 100;
-                }, 0);
-                
-                const totalWeight = courseGrades.reduce((sum, grade) => sum + grade.weight, 0);
-                const courseAverage = totalWeight > 0 ? (totalWeightedPoints / totalWeight) * 100 : 0;
-
-                return (
-                  <div key={course.Id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center space-x-2">
-                      <div 
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: course.color }}
-                      />
-                      <span className="font-medium text-gray-900">{course.name}</span>
-                    </div>
-                    <span className="text-lg font-bold text-primary-600">
-                      {courseAverage.toFixed(1)}%
-                    </span>
+      {/* Goal Progress Overview */}
+      {goalProgress.length > 0 && (
+        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Course Goal Progress</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {goalProgress.map(progress => (
+              <div key={progress.courseId} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-medium text-gray-900 text-sm">{progress.courseName}</h4>
+                  <span className={cn(
+                    "text-xs font-medium px-2 py-1 rounded-full",
+                    progress.status === 'achieved' ? "bg-success-100 text-success-800" :
+                    progress.status === 'on-track' ? "bg-primary-100 text-primary-800" :
+                    progress.status === 'warning' ? "bg-warning-100 text-warning-800" :
+                    progress.status === 'behind' ? "bg-error-100 text-error-800" : "bg-gray-100 text-gray-800"
+                  )}>
+                    {progress.status === 'achieved' ? 'Achieved' :
+                     progress.status === 'on-track' ? 'On Track' :
+                     progress.status === 'warning' ? 'Warning' :
+                     progress.status === 'behind' ? 'Behind' : 'No Data'}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-xs text-gray-600">
+                    <span>Current: {progress.currentGrade.toFixed(1)}%</span>
+                    <span>Goal: {progress.goalGrade}%</span>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className={cn(
+                        "h-2 rounded-full transition-all duration-300",
+                        progress.status === 'achieved' ? "bg-gradient-to-r from-success-500 to-success-600" :
+                        progress.status === 'on-track' ? "bg-gradient-to-r from-primary-500 to-primary-600" :
+                        progress.status === 'warning' ? "bg-gradient-to-r from-warning-500 to-warning-600" :
+                        "bg-gradient-to-r from-error-500 to-error-600"
+                      )}
+                      style={{ width: `${Math.min(progress.progress, 100)}%` }}
+                    />
+                  </div>
+                  <div className="text-center text-xs text-gray-500">
+                    {progress.progress.toFixed(0)}% of goal
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -391,12 +451,19 @@ const Grades = () => {
         />
       )}
 
-      {/* Add/Edit Grade Modal */}
+{/* Add/Edit Grade Modal */}
       <AddGradeModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         onSave={handleSaveGrade}
         editingGrade={editingGrade}
+      />
+
+      {/* Goal Settings Modal */}
+      <GoalSettingsModal
+        isOpen={goalModalOpen}
+        onClose={() => setGoalModalOpen(false)}
+        onSave={handleGoalSettingsUpdate}
       />
     </div>
   );
