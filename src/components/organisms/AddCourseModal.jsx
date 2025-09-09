@@ -6,10 +6,11 @@ import ApperIcon from "@/components/ApperIcon";
 import { cn } from "@/utils/cn";
 
 const AddCourseModal = ({ isOpen, onClose, onSave, editingCourse = null }) => {
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
 name: editingCourse?.name_c || editingCourse?.name || "",
     instructor: editingCourse?.instructor_c || editingCourse?.instructor || "",
     schedule: editingCourse?.schedule_c || editingCourse?.schedule || "",
+    details: editingCourse?.details_c || editingCourse?.details || "",
     credits: editingCourse?.credits_c || editingCourse?.credits || 3,
     color: editingCourse?.color_c || editingCourse?.color || "#7c3aed",
     semester: editingCourse?.semester_c || editingCourse?.semester || "Fall 2024"
@@ -63,6 +64,10 @@ name: editingCourse?.name_c || editingCourse?.name || "",
       newErrors.credits = "Credits must be between 1 and 10";
     }
 
+if (formData.details && formData.details.length > 1000) {
+      newErrors.details = "Details must be less than 1000 characters";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -79,10 +84,11 @@ name: editingCourse?.name_c || editingCourse?.name || "",
   };
 
   const handleClose = () => {
-    setFormData({
+setFormData({
       name: "",
       instructor: "",
       schedule: "",
+      details: "",
       credits: 3,
       color: "#7c3aed",
       semester: "Fall 2024"
@@ -153,6 +159,16 @@ name: editingCourse?.name_c || editingCourse?.name || "",
                   error={errors.schedule}
                   required
                   placeholder="e.g., MWF 10:00-11:00 AM"
+                />
+<FormField
+                  label="Details"
+                  name="details"
+                  type="textarea"
+                  value={formData.details}
+                  onChange={handleInputChange}
+                  error={errors.details}
+                  placeholder="Additional course information, description, or notes..."
+                  rows={3}
                 />
 
                 <div className="grid grid-cols-2 gap-4">
